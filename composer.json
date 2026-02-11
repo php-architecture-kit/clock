@@ -1,0 +1,27 @@
+{
+    "name": "php-architecture-kit/clock",
+    "description": "Another Clock implementation but if you allow the PHP Architecture library to be used on your domains, then you may prefer `new SystemClock` from that library rather than any other.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "clock",
+        "ddd",
+        "framework-agnostic"
+    ],
+    "homepage": "https://github.com/php-architecture-kit/clock",
+    "support": {
+        "issues": "https://github.com/php-architecture-kit/clock/issues",
+        "source": "https://github.com/php-architecture-kit/clock"
+    },
+    "require": {
+        "php": "^7.4 || ^8.0",
+        "psr/clock": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "PhpArchitecture\\Clock\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
