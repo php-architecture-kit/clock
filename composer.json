@@ -3,6 +3,13 @@
     "description": "Another Clock implementation but if you allow the PHP Architecture library to be used on your domains, then you may prefer `new SystemClock` from that library rather than any other.",
     "type": "library",
     "license": "MIT",
+    "authors": [
+        {
+            "email": "patryk.baszak@gmail.com",
+            "name": "Patryk Baszak",
+            "homepage": "https://patrykbaszak.com/"
+        }
+    ],
     "keywords": [
         "clock",
         "ddd",

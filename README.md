@@ -168,6 +168,10 @@ class OrderServiceTest extends TestCase
 | `utc(): self` | Factory: create UTC clock |
 | `now(): DateTimeImmutable` | Returns current time in timezone |
 
+## Testing
+
+Package is tested with PHPUnit in the [php-architecture-kit/workspace](https://github.com/php-architecture-kit/workspace) project. 
+
 ## License
 
 MIT
