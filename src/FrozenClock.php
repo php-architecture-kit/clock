@@ -9,24 +9,24 @@ use Psr\Clock\ClockInterface;
 
 final class FrozenClock implements ClockInterface
 {
-    private \DateTimeImmutable $frozenAt;
+    private DateTimeImmutable $frozenAt;
 
-    public function __construct(\DateTimeImmutable $frozenAt)
+    public function __construct(DateTimeImmutable $frozenAt)
     {
         $this->frozenAt = $frozenAt;
     }
 
-    public static function at(\DateTimeImmutable $frozenAt): self
+    public static function at(DateTimeImmutable $frozenAt): self
     {
         return new self($frozenAt);
     }
 
     public static function fromNow(): self
     {
-        return new self(new \DateTimeImmutable());
+        return new self(new DateTimeImmutable());
     }
 
-    public function now(): \DateTimeImmutable
+    public function now(): DateTimeImmutable
     {
         return $this->frozenAt;
     }

@@ -10,20 +10,20 @@ use Psr\Clock\ClockInterface;
 
 final class LocalizedClock implements ClockInterface
 {
-    private \DateTimeZone $timeZone;
+    private DateTimeZone $timeZone;
 
-    public function __construct(\DateTimeZone $timeZone)
+    public function __construct(DateTimeZone $timeZone)
     {
         $this->timeZone = $timeZone;
     }
 
     public static function utc(): self
     {
-        return new self(new \DateTimeZone('UTC'));
+        return new self(new DateTimeZone('UTC'));
     }
 
-    public function now(): \DateTimeImmutable
+    public function now(): DateTimeImmutable
     {
-        return new \DateTimeImmutable('now', $this->timeZone);
+        return new DateTimeImmutable('now', $this->timeZone);
     }
 }
