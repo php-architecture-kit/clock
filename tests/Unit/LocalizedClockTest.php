@@ -8,13 +8,15 @@ use PhpArchitecture\Clock\LocalizedClock;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
+use DateTimeImmutable;
+use DateTimeZone;
 
 class LocalizedClockTest extends TestCase
 {
     #[Test]
     public function implementsClockInterface(): void
     {
-        $clock = new LocalizedClock(new \DateTimeZone('UTC'));
+        $clock = new LocalizedClock(new DateTimeZone('UTC'));
 
         $this->assertInstanceOf(ClockInterface::class, $clock);
     }
@@ -22,15 +24,15 @@ class LocalizedClockTest extends TestCase
     #[Test]
     public function nowReturnsDateTimeImmutable(): void
     {
-        $clock = new LocalizedClock(new \DateTimeZone('UTC'));
+        $clock = new LocalizedClock(new DateTimeZone('UTC'));
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $clock->now());
+        $this->assertInstanceOf(DateTimeImmutable::class, $clock->now());
     }
 
     #[Test]
     public function nowReturnsTimeInSpecifiedTimezone(): void
     {
-        $timezone = new \DateTimeZone('Europe/Warsaw');
+        $timezone = new DateTimeZone('Europe/Warsaw');
         $clock = new LocalizedClock($timezone);
 
         $now = $clock->now();
@@ -51,8 +53,8 @@ class LocalizedClockTest extends TestCase
     #[Test]
     public function differentTimezonesReturnDifferentOffsets(): void
     {
-        $utcClock = new LocalizedClock(new \DateTimeZone('UTC'));
-        $tokyoClock = new LocalizedClock(new \DateTimeZone('Asia/Tokyo'));
+        $utcClock = new LocalizedClock(new DateTimeZone('UTC'));
+        $tokyoClock = new LocalizedClock(new DateTimeZone('Asia/Tokyo'));
 
         $utcNow = $utcClock->now();
         $tokyoNow = $tokyoClock->now();
@@ -69,11 +71,11 @@ class LocalizedClockTest extends TestCase
     public function nowReturnsCurrentTime(): void
     {
         $clock = LocalizedClock::utc();
-        $before = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $before = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
         $now = $clock->now();
 
-        $after = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $after = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
         $this->assertGreaterThanOrEqual($before->getTimestamp(), $now->getTimestamp());
         $this->assertLessThanOrEqual($after->getTimestamp(), $now->getTimestamp());
@@ -103,7 +105,7 @@ class LocalizedClockTest extends TestCase
         ];
 
         foreach ($timezones as $tz) {
-            $clock = new LocalizedClock(new \DateTimeZone($tz));
+            $clock = new LocalizedClock(new DateTimeZone($tz));
             $now = $clock->now();
 
             $this->assertSame($tz, $now->getTimezone()->getName());

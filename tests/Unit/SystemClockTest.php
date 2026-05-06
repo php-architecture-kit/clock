@@ -8,6 +8,7 @@ use PhpArchitecture\Clock\SystemClock;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
+use DateTimeImmutable;
 
 class SystemClockTest extends TestCase
 {
@@ -24,18 +25,18 @@ class SystemClockTest extends TestCase
     {
         $clock = new SystemClock();
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $clock->now());
+        $this->assertInstanceOf(DateTimeImmutable::class, $clock->now());
     }
 
     #[Test]
     public function nowReturnsCurrentTime(): void
     {
         $clock = new SystemClock();
-        $before = new \DateTimeImmutable();
+        $before = new DateTimeImmutable();
 
         $now = $clock->now();
 
-        $after = new \DateTimeImmutable();
+        $after = new DateTimeImmutable();
 
         $this->assertGreaterThanOrEqual($before->getTimestamp(), $now->getTimestamp());
         $this->assertLessThanOrEqual($after->getTimestamp(), $now->getTimestamp());
