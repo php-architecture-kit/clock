@@ -8,13 +8,15 @@ use PhpArchitecture\Clock\FrozenClock;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\TestCase;
 use Psr\Clock\ClockInterface;
+use DateTimeImmutable;
+use DateTimeZone;
 
 class FrozenClockTest extends TestCase
 {
     #[Test]
     public function implementsClockInterface(): void
     {
-        $clock = new FrozenClock(new \DateTimeImmutable());
+        $clock = new FrozenClock(new DateTimeImmutable());
 
         $this->assertInstanceOf(ClockInterface::class, $clock);
     }
@@ -22,15 +24,15 @@ class FrozenClockTest extends TestCase
     #[Test]
     public function nowReturnsDateTimeImmutable(): void
     {
-        $clock = new FrozenClock(new \DateTimeImmutable());
+        $clock = new FrozenClock(new DateTimeImmutable());
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $clock->now());
+        $this->assertInstanceOf(DateTimeImmutable::class, $clock->now());
     }
 
     #[Test]
     public function nowAlwaysReturnsSameTime(): void
     {
-        $frozenTime = new \DateTimeImmutable('2024-06-15 12:00:00');
+        $frozenTime = new DateTimeImmutable('2024-06-15 12:00:00');
         $clock = new FrozenClock($frozenTime);
 
         $now1 = $clock->now();
@@ -45,7 +47,7 @@ class FrozenClockTest extends TestCase
     #[Test]
     public function atFactoryCreatesFrozenClock(): void
     {
-        $frozenTime = new \DateTimeImmutable('2024-01-01 00:00:00');
+        $frozenTime = new DateTimeImmutable('2024-01-01 00:00:00');
         $clock = FrozenClock::at($frozenTime);
 
         $this->assertEquals($frozenTime, $clock->now());
@@ -54,9 +56,9 @@ class FrozenClockTest extends TestCase
     #[Test]
     public function fromNowFactoryFreezesCurrentTime(): void
     {
-        $before = new \DateTimeImmutable();
+        $before = new DateTimeImmutable();
         $clock = FrozenClock::fromNow();
-        $after = new \DateTimeImmutable();
+        $after = new DateTimeImmutable();
 
         $frozenTime = $clock->now();
 
@@ -80,7 +82,7 @@ class FrozenClockTest extends TestCase
     #[Test]
     public function preservesTimezone(): void
     {
-        $frozenTime = new \DateTimeImmutable('2024-06-15 12:00:00', new \DateTimeZone('Europe/Warsaw'));
+        $frozenTime = new DateTimeImmutable('2024-06-15 12:00:00', new DateTimeZone('Europe/Warsaw'));
         $clock = new FrozenClock($frozenTime);
 
         $now = $clock->now();
@@ -91,8 +93,8 @@ class FrozenClockTest extends TestCase
     #[Test]
     public function preservesMicroseconds(): void
     {
-        /** @var \DateTimeImmutable $frozenTime */
-        $frozenTime = \DateTimeImmutable::createFromFormat('U.u', '1718450400.123456');
+        /** @var DateTimeImmutable $frozenTime */
+        $frozenTime = DateTimeImmutable::createFromFormat('U.u', '1718450400.123456');
         $clock = new FrozenClock($frozenTime);
 
         $now = $clock->now();
@@ -103,7 +105,7 @@ class FrozenClockTest extends TestCase
     #[Test]
     public function canBeUsedForDeterministicTesting(): void
     {
-        $testTime = new \DateTimeImmutable('2024-12-25 10:30:00');
+        $testTime = new DateTimeImmutable('2024-12-25 10:30:00');
         $clock = FrozenClock::at($testTime);
 
         // Simulate using clock in application code
