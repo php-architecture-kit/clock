@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Tests\PhpArchitecture\Clock\Unit;
+namespace PhpArchitecture\Clock\Tests\Unit;
 
 use PhpArchitecture\Clock\SystemClock;
 use PHPUnit\Framework\Attributes\Test;
