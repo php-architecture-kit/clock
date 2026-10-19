@@ -5,10 +5,10 @@ PSR-20 Clock implementations for PHP applications. Provides testable time abstra
 ## Features
 
 - **PSR-20 compliant** - Implements `Psr\Clock\ClockInterface`
-- **Testable** - `FrozenClock` for deterministic unit tests
+- **Testable** - `FrozenClock` for deterministic unit tests, `ManualClock` when time has to move
 - **Timezone-aware** - `LocalizedClock` for specific timezones
 - **Zero dependencies** - Only requires `psr/clock`
-- **PHP 7.4+** - Compatible with legacy and modern PHP
+- **PHP 8.0+**
 
 ## Installation
 
@@ -22,6 +22,7 @@ composer require php-architecture-kit/clock
 use PhpArchitecture\Clock\SystemClock;
 use PhpArchitecture\Clock\FrozenClock;
 use PhpArchitecture\Clock\LocalizedClock;
+use PhpArchitecture\Clock\ManualClock;
 
 // Production: Use system clock
 $clock = new SystemClock();
@@ -30,6 +31,11 @@ $now = $clock->now(); // DateTimeImmutable
 // Testing: Use frozen clock
 $clock = FrozenClock::at(new \DateTimeImmutable('2024-06-15 12:00:00'));
 $now = $clock->now(); // Always returns '2024-06-15 12:00:00'
+
+// Testing timeouts or simulations: Use manual clock
+$clock = ManualClock::at(new \DateTimeImmutable('2024-06-15 12:00:00'));
+$clock->advanceSeconds(30);
+$now = $clock->now(); // '2024-06-15 12:00:30'
 
 // Timezone-specific: Use localized clock
 $clock = new LocalizedClock(new \DateTimeZone('Europe/Warsaw'));
@@ -66,6 +72,27 @@ $clock->now(); // Always the same
 usleep(10000);
 $clock->now(); // Still the same
 ```
+
+### ManualClock
+
+Returns a fixed time that moves only when told to. Use it in tests of timeouts and expiry, or to drive a simulation step by step.
+
+```php
+$clock = ManualClock::at(new \DateTimeImmutable('2024-01-01 00:00:00'));
+// or: ManualClock::fromNow();
+
+$clock->now();                                  // '2024-01-01 00:00:00', until moved
+
+$clock->advanceSeconds(90);                     // '2024-01-01 00:01:30'
+$clock->advance(new \DateInterval('P1D'));      // '2024-01-02 00:01:30'
+$clock->set(new \DateTimeImmutable('2023-12-31 23:59:59')); // jump anywhere, also back
+
+$clock->advanceSeconds(-1);                     // InvalidArgumentException
+```
+
+`advance()` and `advanceSeconds()` only move time forward - a negative step throws, because timeout and expiry logic usually assumes time never goes back. Moving back is possible only explicitly, with `set()`. The timezone and microseconds of the initial time are kept.
+
+Unlike `FrozenClock`, a `ManualClock` is mutable: every service holding the same instance sees the new time.
 
 ### LocalizedClock
 
@@ -135,12 +162,32 @@ class OrderServiceTest extends TestCase
 }
 ```
 
+### Testing a Timeout
+
+```php
+class ReservationTest extends TestCase
+{
+    public function testReservationExpiresAfterFifteenMinutes(): void
+    {
+        $clock = ManualClock::at(new \DateTimeImmutable('2024-06-15 12:00:00'));
+        $reservation = new Reservation($clock);
+
+        $clock->advanceSeconds(14 * 60);
+        $this->assertFalse($reservation->isExpired());
+
+        $clock->advanceSeconds(60);
+        $this->assertTrue($reservation->isExpired());
+    }
+}
+```
+
 ## Comparison
 
 | Clock | Use Case | Time Changes |
 |-------|----------|--------------|
 | `SystemClock` | Production | Yes |
 | `FrozenClock` | Unit tests | No |
+| `ManualClock` | Timeout tests, simulations | When told to |
 | `LocalizedClock` | Timezone-specific apps | Yes |
 
 ## API Reference
@@ -159,6 +206,18 @@ class OrderServiceTest extends TestCase
 | `at(DateTimeImmutable $frozenAt): self` | Factory: create with fixed time |
 | `fromNow(): self` | Factory: freeze current time |
 | `now(): DateTimeImmutable` | Returns the frozen time |
+
+### ManualClock
+
+| Method | Description |
+|--------|-------------|
+| `__construct(DateTimeImmutable $now)` | Create at given time |
+| `at(DateTimeImmutable $now): self` | Factory: create at given time |
+| `fromNow(): self` | Factory: start at current time |
+| `now(): DateTimeImmutable` | Returns the current manual time |
+| `advance(DateInterval $interval): void` | Moves time forward; throws `InvalidArgumentException` for a negative interval |
+| `advanceSeconds(int $seconds): void` | Moves time forward by seconds; throws `InvalidArgumentException` for negative seconds |
+| `set(DateTimeImmutable $now): void` | Jumps to the given time, forward or backward |
 
 ### LocalizedClock
 
